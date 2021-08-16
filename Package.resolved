@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "libPhoneNumber-iOS",
+        "repositoryURL": "https://github.com/Let-it-Juice/libPhoneNumber-iOS",
+        "state": {
+          "branch": "master",
+          "revision": "598b3a9777af79c8feacb47a98a84d862d735b9c",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
