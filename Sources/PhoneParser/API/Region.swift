@@ -9,6 +9,10 @@ import Foundation
 
 public struct Region {
     public let code: String
+
+    public init(code: String) {
+        self.code = code
+    }
 }
 
 public extension Region {
