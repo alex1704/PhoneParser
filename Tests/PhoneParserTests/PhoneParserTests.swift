@@ -31,7 +31,7 @@ final class PhoneParserTests: XCTestCase {
             XCTAssertEqual(regionCode, region.code)
         }
     }
-    
+
     func testCanadaCodes() throws {
         let parser = PhoneParser()
         for code in canadaCountryCodes {
@@ -42,7 +42,7 @@ final class PhoneParserTests: XCTestCase {
             XCTAssertEqual("CA", region.code)
         }
     }
-    
+
     func testPhoneNumberGeneration() throws {
         let parser = PhoneParser()
         let countryCodeMap = try loadCountryCodesMap()
@@ -65,7 +65,7 @@ final class PhoneParserTests: XCTestCase {
         try countryCodeMap.data.forEach { try check($0, $1) }
         try regionPhoneMap.data.forEach { try check($1.cleanedUpPhoneNumberString, [$0]) }
     }
-    
+
     func testPhoneNumberGenerateExceptionOnInvalidRegion() throws {
         let parser = PhoneParser()
         var thrownError: Swift.Error?
@@ -75,6 +75,40 @@ final class PhoneParserTests: XCTestCase {
         }
 
         XCTAssertEqual(PhoneParserError.invalidRegion.localizedDescription, thrownError?.localizedDescription)
+    }
+
+    func testPhoneFormatting() throws {
+        let parser = PhoneParser()
+        let countryCodeMap = try loadCountryCodesMap()
+        let regionPhoneMap = try loadRegionsMap()
+        let check: (String, [String]) throws -> Void = { countryCode, regionCodes in
+            guard let regionCode = regionCodes.first else {
+                throw TestsError.unknown
+            }
+
+            let region = Region(code: regionCode)
+
+            guard region.isValid else {
+                return
+            }
+
+            let phone = try parser.exampleNumber(for: region, startsWith: PhoneNumber(value: countryCode))
+            let value = try parser.formattedString(with: phone, in: region)
+
+            let components = value.components(separatedBy: " ")
+            components.forEach { string in
+                XCTAssert(!string.isEmpty)
+                XCTAssert(string.allSatisfy { $0.isNumber }, "\(string) has non numbers")
+            }
+
+            let expected = phone.value(for: .pureNumber)
+            let received = value.replacingOccurrences(of: " ", with: "")
+
+            XCTAssert(expected == received, "\(expected) != \(received)")
+        }
+
+        try countryCodeMap.data.forEach { try check($0, $1) }
+        try regionPhoneMap.data.forEach { try check($1.cleanedUpPhoneNumberString, [$0]) }
     }
     
 }

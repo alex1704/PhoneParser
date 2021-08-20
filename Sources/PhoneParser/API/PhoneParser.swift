@@ -73,11 +73,29 @@ public class PhoneParser {
         let exampleNumberValue =  try perform(try util.format(exampleNumber, numberFormat: .INTERNATIONAL).cleanedUpPhoneNumberString) { err in
             PhoneParserError.internal(description: "util.format(_, numberFormat:) error = \(err); nbNumber == \(exampleNumber)")
         }
+            .replacingOccurrences(of: ".", with: "")
         
         let phonePrefix = phone?.value(for: .pureNumber) ?? ""
         let phoneSuffix = String(exampleNumberValue.dropFirst(phonePrefix.count))
         
         return try generateValidatedPhoneNumber(phonePrefix: phonePrefix, phoneSuffix: phoneSuffix)
+    }
+
+    /// Provides spaced formatted phone number according to Region, ex region = UA; phone = 380503456789; result = "380 50 345 67 89"
+    /// - Parameters:
+    ///   - phone: PhoneNumber
+    ///   - region: Region
+    /// - Returns: Formatted phone number value
+    public func formattedString(with phone: PhoneNumber, in region: Region) throws -> String {
+        guard let formatter = NBAsYouTypeFormatter(regionCode: region.code) else {
+            throw PhoneParserError.internal(description: "Unable instanciate NBAsYouTypeFormatter for region \(region.code)")
+        }
+
+        guard let value = formatter.normalizedInputString(phone.value(for: .mobile)) else {
+            throw PhoneParserError.unknown
+        }
+
+        return value
     }
     
     // MARK: - Private

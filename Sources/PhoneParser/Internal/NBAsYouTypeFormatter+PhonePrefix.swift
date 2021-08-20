@@ -21,19 +21,31 @@ extension NBAsYouTypeFormatter {
     func phonePrefix(from phone: PhoneNumber) -> PhonePrefix? {
         return phonePrefix(from: phone.value(for: .mobile))
     }
+
+    /// Normalize inputString functionality by removing occurances of '+' character and replacing '.' and '-' with spaces
+    /// - Parameter string: Phone number string to normalize
+    /// - Returns: Normalized phone number
+    public func normalizedInputString(_ string: String) -> String? {
+        // formattedString == 1 123-1 or 44 45 31
+        // normalize to one format 'num num num': '1 123-1' -> '1 123 1'
+        inputString(string)?
+            .replacingOccurrences(of: "-", with: " ")
+            .replacingOccurrences(of: ".", with: " ")
+            .replacingOccurrences(of: "+", with: "")
+    }
     
+    // MARK: - Private
+
     private func phonePrefix(from string: String) -> PhonePrefix? {
         let components = inputStringComponents(string)
-        
+
         // make sure that area code is present
         guard components.count >= 2 else {
             return nil
         }
-        
+
         return PhonePrefix(idd: components[0], areaCode: components[1])
     }
-    
-    // MARK: - Private
     
     private func inputStringComponents(_ string: String) -> [String] {
         guard let formattedString = normalizedInputString(string) else {
@@ -43,13 +55,5 @@ extension NBAsYouTypeFormatter {
         return formattedString.split(separator: " ")
             .map { String($0).trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-    }
-    
-    private func normalizedInputString(_ string: String) -> String? {
-        // formattedString == 1 123-1 or 44 45 31
-        // normalize to one format 'num num num': '1 123-1' -> '1 123 1'
-        inputString(string)?
-            .replacingOccurrences(of: "-", with: " ")
-            .replacingOccurrences(of: "+", with: "")
     }
 }
