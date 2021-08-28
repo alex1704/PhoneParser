@@ -110,7 +110,29 @@ final class PhoneParserTests: XCTestCase {
         try countryCodeMap.data.forEach { try check($0, $1) }
         try regionPhoneMap.data.forEach { try check($1.cleanedUpPhoneNumberString, [$0]) }
     }
-    
+
+    func testPhoneValidity() throws {
+        let parser = PhoneParser()
+        let countryCodeMap = try loadCountryCodesMap()
+        let regionPhoneMap = try loadRegionsMap()
+        let check: (String, [String]) throws -> Void = { countryCode, regionCodes in
+            guard let regionCode = regionCodes.first else {
+                throw TestsError.unknown
+            }
+
+            let region = Region(code: regionCode)
+
+            guard region.isValid else {
+                return
+            }
+
+            let phone = try parser.exampleNumber(for: region, startsWith: PhoneNumber(value: countryCode))
+            XCTAssert(parser.isValid(phone))
+        }
+
+        try countryCodeMap.data.forEach { try check($0, $1) }
+        try regionPhoneMap.data.forEach { try check($1.cleanedUpPhoneNumberString, [$0]) }
+    }
 }
 
 extension PhoneParserTests {

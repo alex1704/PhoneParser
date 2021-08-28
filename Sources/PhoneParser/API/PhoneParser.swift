@@ -97,6 +97,17 @@ public class PhoneParser {
 
         return value
     }
+
+    /// Checks that phone number matches valid pattern.
+    /// - Parameter phone: Phone number
+    /// - Returns: True if phone number in its region.
+    public func isValid(_ phone: PhoneNumber) -> Bool {
+        guard let parsedNumber = try? util.parse(withPhoneCarrierRegion: phone.value(for: .mobile)) else {
+            return false
+        }
+
+        return util.isValidNumber(parsedNumber)
+    }
     
     // MARK: - Private
     // MARK: -
