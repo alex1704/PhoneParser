@@ -13,7 +13,7 @@ let package = Package(
             targets: ["PhoneParser"]),
     ],
     dependencies: [
-        .package(name: "libPhoneNumber", url: "https://github.com/Let-it-Juice/libPhoneNumber-iOS", branch: "master")
+        .package(name: "libPhoneNumber", url: "https://github.com/alex1704/libPhoneNumber-iOS", branch: "master")
     ],
     targets: [
         .target(
